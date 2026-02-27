@@ -42,9 +42,24 @@ pip install -r requirements.txt
 ### 3. Configuration
 1. **API Key**: Create a `.env` file:
    ```bash
-   echo "GEMINI_API_KEY=your_actual_key_here" > .env
+   cp .env.example .env
    ```
+   Then fill in your values:
+   ```env
+   GEMINI_API_KEY=your_gemini_api_key_here
+
+   # Optional: Webshare proxy (see below)
+   WEBSHARE_PROXY_USER=your_proxy_user
+   WEBSHARE_PROXY_PASS=your_proxy_password
+   ```
+
 2. **Vault Path**: Open `sync.py` and `retag_notes.py` and ensure `OBSIDIAN_VAULT_PATH` points to your vault (default is `~/Documents/Obsidian Vault`).
+
+3. **(Optional) Webshare Proxy**: The tool uses a [Webshare](https://www.webshare.io/) rotating proxy to avoid IP blocks and rate limits when fetching transcripts and video details via `yt-dlp` and the YouTube Transcript API.
+   - Sign up for a free or paid plan at [webshare.io](https://www.webshare.io/).
+   - Copy your **Proxy Username** and **Proxy Password** from the Webshare dashboard.
+   - Add them to your `.env` file as `WEBSHARE_PROXY_USER` and `WEBSHARE_PROXY_PASS`.
+   - If these are not set, the tool will attempt to connect directly (which may result in throttling or blocks for large syncs).
 
 ---
 
