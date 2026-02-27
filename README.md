@@ -1,163 +1,221 @@
-# 📺 Obsidian YouTube Sync: AI-Powered PKM Automation
+# 📺 ObsidianYouTubeSync — YouTube History Downloader, Transcript Extractor & AI Knowledge Graph Builder
 
 [![Obsidian](https://img.shields.io/badge/Made%20for-Obsidian-8b6cef?logo=obsidian)](https://obsidian.md)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![MCP Compatible](https://img.shields.io/badge/MCP-Compatible-5c3d9e?logo=anthropic)](https://modelcontextprotocol.io)
 
-**Turn your YouTube watch history into a structured personal knowledge base.** 
+**Download, sync, and organize your entire YouTube watch history into a structured, AI-tagged knowledge graph — ready for Obsidian, OpenClaw, and GraphRAG pipelines.**
 
-This tool automatically synchronizes your YouTube activity into your **Obsidian Vault**, extracting transcripts, generating AI-driven summaries, and applying a consistent hierarchical taxonomy using Google Gemini.
+This tool automates the full pipeline: it downloads YouTube video metadata, extracts captions and transcripts, generates LLM-powered summaries using Google Gemini (GenAI), and saves each video as a richly categorized Markdown note with a consistent hierarchical taxonomy. Built for users with **large YouTube watch libraries** who want to transform passive viewing history into an active, searchable, and connectable dataset.
 
-> **Keywords:** *youtube, download, sync, history, transcript, caption, summary, genai, llm, organize, categorized*
+> **Use cases:** Personal knowledge management (PKM), YouTube history cataloging, knowledge graph construction, transcript dataset preparation, GraphRAG ingestion, OpenClaw/LLM agent tooling, personal AI training data, second brain building.
+
 ---
 
-## ✨ Key Features
+## ✨ Why ObsidianYouTubeSync?
 
-- **🧠 AI-Driven Summarization**: Uses Google Gemini to generate high-quality summaries of every video.
-- **🏷️ Smart Hierarchical Taxonomy**: Automatically applies hierarchical tags (e.g., `Technology/AI/LLM`) to keep your vault organized.
-- **📜 Full Transcript Extraction**: Pulls full video transcripts and saves them directly in your notes for deep searchability.
-- **🔗 Link Extraction**: Automatically extracts and lists all URLs found in the video description.
-- **⚡ Parallel Processing**: Built with multi-threading to sync hundreds of videos in seconds.
-- **🛠️ Retagging Engine**: Includes a standalone script to apply your global taxonomy to *any* folder in your vault (like Apple Notes or Kindle highlights).
-- **🚫 Shorts Detection**: Automatically identifies and skips YouTube Shorts to maintain a high-signal knowledge base.
+If you have hundreds or thousands of videos in your YouTube history, finding insights buried in that content is nearly impossible without structure. This tool solves that by:
+
+- **Downloading** your full YouTube watch history (incremental or bulk) using `yt-dlp`
+- **Extracting** full captions and transcripts for every video (with fallback to auto-generated captions)
+- **Summarizing** each video using Google Gemini LLM (GenAI) — concise, searchable summaries
+- **Categorizing** content with a shared hierarchical taxonomy (e.g., `Technology/ArtificialIntelligence`, `Science/Neuroscience`) using AI classification
+- **Organizing** notes into Obsidian with clean YAML frontmatter (tags, url, channel, date, summary) — queryable via Dataview
+- **Enabling** downstream pipelines: export structured notes as a knowledge graph dataset for **GraphRAG**, **OpenClaw**, vector databases, or LLM fine-tuning
+
+---
+
+## 🧠 Key Features
+
+| Feature | Details |
+|---|---|
+| **LLM Summarization** | Google Gemini (GenAI) generates concise, high-quality summaries for every video |
+| **Full Transcript Download** | Pulls captions/transcripts (manual + auto-generated) from YouTube |
+| **Hierarchical AI Tagging** | CamelCase taxonomy tags like `Technology/AI/LLM`, `Person/ElonMusk` |
+| **History Sync** | Download & sync your entire YouTube watch history via browser cookies + `yt-dlp` |
+| **Incremental Updates** | Smart detection — only processes new videos, skips already-synced ones |
+| **YouTube Shorts Skip** | Automatically detects and skips Shorts to keep your knowledge base high-signal |
+| **Vault-wide Retagging** | Retag any folder (Apple Notes, Books, etc.) using the same global AI taxonomy |
+| **Parallel Processing** | `ThreadPoolExecutor` with configurable pool — syncs 100s of videos in minutes |
+| **MCP Server** | Native [Model Context Protocol](https://modelcontextprotocol.io) server for AI agent integration |
+| **GraphRAG-Ready Output** | Structured Markdown with rich metadata nodes for knowledge graph pipelines |
+
+---
+
+## 🗂️ Output Format — GraphRAG & Knowledge Graph Ready
+
+Each YouTube video becomes a structured Markdown node with rich metadata. This format is directly ingestible by **OpenClaw**, **GraphRAG**, LlamaIndex, LangChain, or any knowledge graph pipeline:
+
+```markdown
+---
+url: https://www.youtube.com/watch?v=VIDEO_ID
+channel: "Lex Fridman"
+date_synced: 2026-02-27
+summary: "A deep conversation on the nature of intelligence and the trajectory of AGI development, exploring consciousness, Gödel's theorems, and the limits of computation."
+tags:
+  - Technology
+  - Technology/ArtificialIntelligence
+  - Technology/ArtificialIntelligence/LLM
+  - Science/CognitiveScience
+  - Person/LexFridman
+  - Person/JohnCarmack
+  - AGI
+  - ConsciousnessDebate
+  - ComputationalLimits
+---
+
+# The Future of AGI with John Carmack
+
+## Extracted Links
+- https://en.wikipedia.org/wiki/Gödel%27s_incompleteness_theorems
+
+## Description
+In this episode, Lex Fridman sits down with John Carmack to discuss...
+
+## Raw Transcript
+[Full verbatim transcript for semantic search, embedding, and RAG ingestion]
+```
+
+### Why this structure matters for GraphRAG / OpenClaw:
+- **Entities** (`Person/`, `Company/`, `Location/`) form graph nodes
+- **Taxonomy tags** form typed edges between concepts
+- **Summaries** are ideal embedding targets for semantic similarity
+- **Transcripts** provide raw text for chunking, dense retrieval, and fine-tuning
+- **Dates + channels** enable temporal and source-based graph traversals
+
+---
 
 ## 🚀 Getting Started
 
-### 1. Prerequisites
-- **Python 3.10+** installed on your system.
-- **Google Gemini API Key**: Get a free key from the [Google AI Studio](https://aistudio.google.com/).
-- **Chrome/Safari/Firefox**: Logged into YouTube (used by `yt-dlp` to fetch your private history).
+### Prerequisites
+- **Python 3.10+**
+- **Google Gemini API Key** — free tier available at [Google AI Studio](https://aistudio.google.com/)
+- **Chrome, Safari, or Firefox** logged into YouTube (for `yt-dlp` history access)
+- **Obsidian** (optional but recommended for visualization and Dataview queries)
 
-### 2. Installation
+### Installation
+
 ```bash
 # Clone the repository
-git clone https://github.com/[user name]/YouTubeSyncTool.git
-cd YouTubeSyncTool
+git clone https://github.com/mr8lu/ObsidianYouTubeSync.git
+cd ObsidianYouTubeSync
 
-# Set up environment
+# Set up Python environment
 python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### 3. Configuration
-1. **API Key**: Create a `.env` file:
-   ```bash
-   cp .env.example .env
-   ```
-   Then fill in your values:
-   ```env
-   GEMINI_API_KEY=your_gemini_api_key_here
+### Configuration
 
-   # Optional: Webshare proxy (see below)
-   WEBSHARE_PROXY_USER=your_proxy_user
-   WEBSHARE_PROXY_PASS=your_proxy_password
-   ```
+```bash
+# Copy the example environment file
+cp .env.example .env
+```
 
-2. **Vault Path**: Open `sync.py` and `retag_notes.py` and ensure `OBSIDIAN_VAULT_PATH` points to your vault (default is `~/Documents/Obsidian Vault`).
+Edit `.env` with your credentials:
+```env
+GEMINI_API_KEY=your_gemini_api_key_here
 
-3. **(Optional) Webshare Proxy**: The tool uses a [Webshare](https://www.webshare.io/) rotating proxy to avoid IP blocks and rate limits when fetching transcripts and video details via `yt-dlp` and the YouTube Transcript API.
-   - Sign up for a free or paid plan at [webshare.io](https://www.webshare.io/).
-   - Copy your **Proxy Username** and **Proxy Password** from the Webshare dashboard.
-   - Add them to your `.env` file as `WEBSHARE_PROXY_USER` and `WEBSHARE_PROXY_PASS`.
-   - If these are not set, the tool will attempt to connect directly (which may result in throttling or blocks for large syncs).
+# Optional: Webshare rotating proxy (recommended for large history syncs)
+WEBSHARE_PROXY_USER=your_proxy_user
+WEBSHARE_PROXY_PASS=your_proxy_password
+```
+
+> **Vault Path**: The default is `~/Documents/Obsidian Vault`. Update `OBSIDIAN_VAULT_PATH` in `sync.py` and `retag_notes.py` if your vault lives elsewhere.
 
 ---
 
 ## 🛠️ Usage
 
-### Syncing YouTube History
-Run the script via `run.sh` to start pulling your recent watch history.
+### Sync Your YouTube Watch History
 
 ```bash
-# Typical daily sync (incremental)
-./run.sh --incremental
-
-# First-time setup (sync last 500 videos)
+# First-time full sync (downloads your complete watch history)
 ./run.sh --init
 
-# Re-process and re-tag existing notes
+# Incremental daily sync (only processes new videos)
+./run.sh --incremental
+
+# Re-tag and re-categorize all existing notes with the latest taxonomy
 ./run.sh --retag
 ```
 
-### Re-tagging Existing Notes (The "Retag" Engine)
-You can use the built-in logic to clean up *any* folder in your Obsidian vault with your global AI taxonomy.
+### Retag Any Folder with the Global AI Taxonomy
+
+Apply consistent LLM-powered categorization to *any* existing notes folder:
 
 ```bash
-# Preview changes (Dry Run)
+# Dry-run preview (no files modified)
 python3 retag_notes.py --folder "~/Documents/Obsidian Vault/Apple Notes" --dry-run
 
-# Run live updates
-python3 retag_notes.py --folder "~/Documents/Obsidian Vault/Apple Notes"
+# Live retag
+python3 retag_notes.py --folder "~/Documents/Obsidian Vault/Books"
+
+# Control parallelism
+python3 retag_notes.py --folder "~/Documents/Obsidian Vault/Books" --workers 10
 ```
 
-## 🤖 MCP Server Integration (For AI Agents)
+---
 
-This toolkit includes a native **Model Context Protocol (MCP)** server, allowing AI assistants (like Claude Desktop, Cursor, or other MCP-compatible clients) to autonomously trigger syncs or retag your vault.
+## 🤖 MCP Server — AI Agent Integration
 
-### Exposed Tools
-- `sync_youtube_history(mode)`: Triggers the main sync engine (supports `incremental`, `init`, `retag`, or `test` modes).
-- `retag_obsidian_notes(folder, dry_run)`: Triggers the retag engine against any local folder.
+This toolkit ships with a native **[Model Context Protocol (MCP)](https://modelcontextprotocol.io)** server. Wire it directly into Claude Desktop, Cursor, or any MCP-compatible agent to let AI autonomously manage your knowledge base.
 
-### Setup for Claude Desktop
-Add the following to your `claude_desktop_config.json`:
+### Exposed Agent Tools
+
+```
+sync_youtube_history(mode: str)
+  → Triggers the YouTube sync pipeline.
+  → mode: "incremental" | "init" | "retag" | "test"
+
+retag_obsidian_notes(folder: str = None, dry_run: bool = False)
+  → Runs the AI retagging engine on any local folder.
+```
+
+### Claude Desktop Setup
+
+Add to your `claude_desktop_config.json`:
 
 ```json
 {
   "mcpServers": {
-    "YouTubeSyncTool": {
-      "command": "/absolute/path/to/YouTubeSyncTool/venv/bin/python3",
-      "args": [
-        "/absolute/path/to/YouTubeSyncTool/mcp_server.py"
-      ]
+    "ObsidianYouTubeSync": {
+      "command": "/absolute/path/to/ObsidianYouTubeSync/venv/bin/python3",
+      "args": ["/absolute/path/to/ObsidianYouTubeSync/mcp_server.py"]
     }
   }
 }
 ```
-*Note: Ensure you replace `/absolute/path/to/` with the actual path to the repository on your machine.*
+
+Once configured, you can prompt Claude: *"Sync my YouTube history and categorize anything I've watched about LLMs this week."*
 
 ---
 
-## 🏗️ Why this works for Obsidian
-This tool is designed specifically for the **Obsidian/PKM** workflow:
-- **Native Properties**: Uses standard YAML Frontmatter (`tags:`, `url:`, `summary:`) that Obsidian recognizes instantly as [Properties](https://help.obsidian.md/Editing+and+formatting/Properties).
-- **Hierarchical Tags**: Generates tags in the `Parent/Child` format, allowing you to browse your knowledge tree in the Obsidian Tag Pane.
-- **Metadata-Rich**: Every note includes the uploader name, sync date, and source link for easy Dataview queries.
+## 📊 Building a Knowledge Graph with Your YouTube History
 
----
+This tool is purpose-built as a **data pipeline** for knowledge graph construction. Here's how to plug it into downstream systems:
 
-## 📄 Sample Output Note
+### For GraphRAG (Microsoft GraphRAG / LlamaIndex)
+1. Run `./run.sh --init` to sync your complete YouTube history
+2. Point your GraphRAG pipeline at the `~/Documents/Obsidian Vault/YouTube/` folder
+3. The YAML frontmatter is parsed as node metadata; transcripts are chunked for retrieval; tags form the typed edge schema
 
-Every synced video becomes a beautifully structured Obsidian note:
+### For OpenClaw
+- Each note file is a self-contained document node with entity tags (`Person/`, `Company/`, `Location/`) pre-extracted
+- The taxonomy hierarchy (`Technology/ArtificialIntelligence/LLM`) maps directly to ontological class trees
+- Channel metadata provides provenance edges in the graph
 
-```markdown
----
-url: https://www.youtube.com/watch?v=dQw4w9WgXcQ
-channel: "Veritasium"
-date_synced: 2026-02-27
-summary: "An exploration of how the brain forms long-term memories and the role of sleep in memory consolidation..."
-tags:
-  - Science
-  - Science/Neuroscience
-  - Science/Neuroscience/Memory
-  - Health/Sleep
-  - Person/MatthewWalker
-  - NeuralPlasticity
-  - SleepScience
-  - CognitivePsychology
----
+### For Vector Databases (Pinecone, Weaviate, Chroma)
+- Summaries are ideal for dense embedding (short, factual, topic-rich)
+- Transcripts can be chunked with metadata-aware splitters
+- Tags can be used as filters/facets for hybrid search
 
-# Why Your Brain Needs Sleep to Learn
-
-## Extracted Links
-- https://www.sleepfoundation.org
-
-## Description
-In this video, we explore the science of memory...
-
-## Raw Transcript
-The hippocampus acts as a temporary storage buffer...
-```
+### For LLM Fine-Tuning Datasets
+- Generate instruction-response pairs from `(transcript) → summary` pairs
+- Use hierarchical tags as classification labels
+- Export with a simple Python script reading the YAML frontmatter
 
 ---
 
@@ -166,30 +224,37 @@ The hippocampus acts as a temporary storage buffer...
 | Feature | Status |
 |---|---|
 | YouTube History Sync (incremental & full) | ✅ Done |
-| AI Summarization + Hierarchical Tags | ✅ Done |
-| Full Transcript Extraction | ✅ Done |
-| Parallel Processing | ✅ Done |
+| AI Summarization via Google Gemini (GenAI) | ✅ Done |
+| Full Transcript / Caption Extraction | ✅ Done |
+| Hierarchical AI Taxonomy Tagging | ✅ Done |
+| Parallel Processing (ThreadPoolExecutor) | ✅ Done |
 | Vault-wide Retagging Engine | ✅ Done |
-| Proxy / Rate-limit support | ✅ Done |
+| Proxy / Rate-limit Support | ✅ Done |
+| MCP Server for AI Agent Integration | ✅ Done |
+| GraphRAG Export Helper Script | 🔜 Planned |
 | Obsidian Community Plugin | 🔜 Planned |
-| Support for Notion / Logseq export | 🔜 Planned |
-| Local LLM support (Ollama) | 💡 Considering |
-| YouTube Playlist sync | 💡 Considering |
+| Notion / Logseq Export | 🔜 Planned |
+| Local LLM Support (Ollama) | 💡 Considering |
+| YouTube Playlist Sync | 💡 Considering |
+| OpenClaw Native Connector | 💡 Considering |
 
 ---
 
-## 🤝 Contributing
+## 🏗️ How It Works with Obsidian
 
-Contributions are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for how to get started.
-
-If you find this useful, please ⭐ **star the repo** — it helps more Obsidian users discover it.
+- **Native YAML Properties**: `tags:`, `url:`, `summary:`, `channel:`, `date_synced` — all recognized by Obsidian natively
+- **Hierarchical Tags**: `Parent/Child` tags map to Obsidian's Tag Pane tree view
+- **Dataview Queries**: Query your entire watch history like a database
+- **Graph View**: Entity tags create visual connections between videos sharing people, companies, or concepts
 
 ---
 
-## 🔒 Permissions & Privacy
-- **Local-First**: Your notes are stored locally on your machine.
-- **No Private Data Uploads**: Only video titles, descriptions, and transcripts are sent to the Gemini API for summarization; no personal account data is ever shared.
-- **Permissions**: Ensure your Terminal app has "Full Disk Access" or permission to access your "Documents" folder on macOS.
+## 🔒 Privacy & Security
+
+- **Local-First**: All notes live on your machine. No cloud sync.
+- **No Account Data**: Only public video metadata (title, description, transcript) is sent to Gemini for summarization. Your YouTube account credentials are never accessed or stored.
+- **Credential Security**: API keys loaded via `.env` (excluded from git). Proxy credentials stored locally only.
+- **macOS Permissions**: Ensure Terminal has "Full Disk Access" in System Settings → Privacy & Security.
 
 ---
 
@@ -203,8 +268,20 @@ If you find this useful, please ⭐ **star the repo** — it helps more Obsidian
 | Python 3.10+ | ✅ |
 | Obsidian 1.0+ | ✅ |
 | Chrome / Safari / Firefox cookies | ✅ |
+| Claude Desktop (MCP) | ✅ |
+| GraphRAG / LlamaIndex | ✅ |
+| OpenClaw | ✅ |
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for how to get started.
+
+If you find this useful, please ⭐ **star the repo** — it helps more researchers, PKM enthusiasts, and knowledge graph builders discover it.
 
 ---
 
 ## 📜 License
+
 Distributed under the MIT License. See `LICENSE` for more information.
