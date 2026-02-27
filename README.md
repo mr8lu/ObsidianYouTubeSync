@@ -85,10 +85,83 @@ This tool is designed specifically for the **Obsidian/PKM** workflow:
 
 ---
 
+## 📄 Sample Output Note
+
+Every synced video becomes a beautifully structured Obsidian note:
+
+```markdown
+---
+url: https://www.youtube.com/watch?v=dQw4w9WgXcQ
+channel: "Veritasium"
+date_synced: 2026-02-27
+summary: "An exploration of how the brain forms long-term memories and the role of sleep in memory consolidation..."
+tags:
+  - Science
+  - Science/Neuroscience
+  - Science/Neuroscience/Memory
+  - Health/Sleep
+  - Person/MatthewWalker
+  - NeuralPlasticity
+  - SleepScience
+  - CognitivePsychology
+---
+
+# Why Your Brain Needs Sleep to Learn
+
+## Extracted Links
+- https://www.sleepfoundation.org
+
+## Description
+In this video, we explore the science of memory...
+
+## Raw Transcript
+The hippocampus acts as a temporary storage buffer...
+```
+
+---
+
+## 🗺️ Roadmap
+
+| Feature | Status |
+|---|---|
+| YouTube History Sync (incremental & full) | ✅ Done |
+| AI Summarization + Hierarchical Tags | ✅ Done |
+| Full Transcript Extraction | ✅ Done |
+| Parallel Processing | ✅ Done |
+| Vault-wide Retagging Engine | ✅ Done |
+| Proxy / Rate-limit support | ✅ Done |
+| Obsidian Community Plugin | 🔜 Planned |
+| Support for Notion / Logseq export | 🔜 Planned |
+| Local LLM support (Ollama) | 💡 Considering |
+| YouTube Playlist sync | 💡 Considering |
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for how to get started.
+
+If you find this useful, please ⭐ **star the repo** — it helps more Obsidian users discover it.
+
+---
+
 ## 🔒 Permissions & Privacy
 - **Local-First**: Your notes are stored locally on your machine.
 - **No Private Data Uploads**: Only video titles, descriptions, and transcripts are sent to the Gemini API for summarization; no personal account data is ever shared.
 - **Permissions**: Ensure your Terminal app has "Full Disk Access" or permission to access your "Documents" folder on macOS.
+
+---
+
+## ⚙️ Compatibility
+
+| Environment | Supported |
+|---|---|
+| macOS (Intel & Apple Silicon) | ✅ |
+| Linux | ✅ |
+| Windows (WSL) | ⚠️ Untested |
+| Python 3.10+ | ✅ |
+| Obsidian 1.0+ | ✅ |
+| Chrome / Safari / Firefox cookies | ✅ |
 
 ---
 
