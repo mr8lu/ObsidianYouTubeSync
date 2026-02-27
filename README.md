@@ -8,6 +8,7 @@
 
 This tool automatically synchronizes your YouTube activity into your **Obsidian Vault**, extracting transcripts, generating AI-driven summaries, and applying a consistent hierarchical taxonomy using Google Gemini.
 
+> **Keywords:** *youtube, download, sync, history, transcript, caption, summary, genai, llm, organize, categorized*
 ---
 
 ## ✨ Key Features
