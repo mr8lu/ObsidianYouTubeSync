@@ -1,80 +1,96 @@
-# YouTube History Sync Tool
+# 📺 Obsidian YouTube Sync: AI-Powered PKM Automation
 
-This tool automatically fetches your YouTube watch history and synchronizes it into your Obsidian Vault. It extracts the video transcription, summarizes the video, generates tags using Google Gemini API, and saves standard Markdown files tailored for Obsidian.
+[![Obsidian](https://img.shields.io/badge/Made%20for-Obsidian-8b6cef?logo=obsidian)](https://obsidian.md)
+[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-## Prerequisites
+**Turn your YouTube watch history into a structured personal knowledge base.** 
 
-1. Python 3: Make sure you have Python 3 installed.
-2. Google Gemini API Key: You'll need to obtain a free Gemini API key to run processing.
+This tool automatically synchronizes your YouTube activity into your **Obsidian Vault**, extracting transcripts, generating AI-driven summaries, and applying a consistent hierarchical taxonomy using Google Gemini.
 
-## Setup
+---
 
-First, activate a virtual environment and install the required dependencies.
+## ✨ Key Features
 
+- **🧠 AI-Driven Summarization**: Uses Google Gemini to generate high-quality summaries of every video.
+- **🏷️ Smart Hierarchical Taxonomy**: Automatically applies hierarchical tags (e.g., `Technology/AI/LLM`) to keep your vault organized.
+- **📜 Full Transcript Extraction**: Pulls full video transcripts and saves them directly in your notes for deep searchability.
+- **🔗 Link Extraction**: Automatically extracts and lists all URLs found in the video description.
+- **⚡ Parallel Processing**: Built with multi-threading to sync hundreds of videos in seconds.
+- **🛠️ Retagging Engine**: Includes a standalone script to apply your global taxonomy to *any* folder in your vault (like Apple Notes or Kindle highlights).
+- **🚫 Shorts Detection**: Automatically identifies and skips YouTube Shorts to maintain a high-signal knowledge base.
+
+## 🚀 Getting Started
+
+### 1. Prerequisites
+- **Python 3.10+** installed on your system.
+- **Google Gemini API Key**: Get a free key from the [Google AI Studio](https://aistudio.google.com/).
+- **Chrome/Safari/Firefox**: Logged into YouTube (used by `yt-dlp` to fetch your private history).
+
+### 2. Installation
 ```bash
-# 1. Create a virtual environment (if not already created)
+# Clone the repository
+git clone https://github.com/[user name]/YouTubeSyncTool.git
+cd YouTubeSyncTool
+
+# Set up environment
 python3 -m venv venv
-
-# 2. Activate the virtual environment
 source venv/bin/activate
-
-# 3. Install requirements
 pip install -r requirements.txt
 ```
 
-*(Note: `run.sh` automatically attempts to activate `venv/bin/activate` in the script directory.)*
-
-## Configuration
-
-1. **API Key**: Create a `.env` file in the root directory and add your Google Gemini API key:
+### 3. Configuration
+1. **API Key**: Create a `.env` file:
    ```bash
    echo "GEMINI_API_KEY=your_actual_key_here" > .env
    ```
-   Alternatively, copy the example file: `cp .env.example .env` and fill in your key.
+2. **Vault Path**: Open `sync.py` and `retag_notes.py` and ensure `OBSIDIAN_VAULT_PATH` points to your vault (default is `~/Documents/Obsidian Vault`).
 
-2. **Vault Path**: Ensure `OBSIDIAN_VAULT_PATH` in `sync.py` and `retag_notes.py` points to your local Obsidian Vault.
+---
 
-## Usage
+## 🛠️ Usage
 
 ### Syncing YouTube History
-Run the script via `run.sh`. Ensure you have Chrome cookies logged into YouTube for `yt-dlp` to fetch history.
+Run the script via `run.sh` to start pulling your recent watch history.
 
-**Incremental Sync (Typical Use):**
 ```bash
+# Typical daily sync (incremental)
 ./run.sh --incremental
-```
 
-**Full Initialization:**
-```bash
+# First-time setup (sync last 500 videos)
 ./run.sh --init
-```
 
-**Re-tagging existing YouTube notes (Taxonomy update):**
-```bash
+# Re-process and re-tag existing notes
 ./run.sh --retag
 ```
 
-### Re-tagging Other Folders (Apple Notes, etc.)
-Use `retag_notes.py` to apply the global taxonomy/keywords to any folder in your vault.
+### Re-tagging Existing Notes (The "Retag" Engine)
+You can use the built-in logic to clean up *any* folder in your Obsidian vault with your global AI taxonomy.
 
 ```bash
 # Preview changes (Dry Run)
-python3 retag_notes.py --dry-run
+python3 retag_notes.py --folder "~/Documents/Obsidian Vault/Apple Notes" --dry-run
 
-# Process default (Apple Notes)
-python3 retag_notes.py
-
-# Process specific folder
-python3 retag_notes.py --folder "~/Documents/Obsidian Vault/Books"
+# Run live updates
+python3 retag_notes.py --folder "~/Documents/Obsidian Vault/Apple Notes"
 ```
 
-## Features
-- **Global Taxonomy**: Shared consistent tagging across different content types.
-- **Multi-threading**: Fast parallel processing using `ThreadPoolExecutor`.
-- **Shorts Detection**: Automatically skips YouTube Shorts to focus on standard videos.
-- **Orphan Support**: Injects frontmatter into notes that don't have it.
-- **Keyword Extraction**: LLM-driven informative keywords merged into tag properties.
+---
 
-## Permissions
+## 🏗️ Why this works for Obsidian
+This tool is designed specifically for the **Obsidian/PKM** workflow:
+- **Native Properties**: Uses standard YAML Frontmatter (`tags:`, `url:`, `summary:`) that Obsidian recognizes instantly as [Properties](https://help.obsidian.md/Editing+and+formatting/Properties).
+- **Hierarchical Tags**: Generates tags in the `Parent/Child` format, allowing you to browse your knowledge tree in the Obsidian Tag Pane.
+- **Metadata-Rich**: Every note includes the uploader name, sync date, and source link for easy Dataview queries.
 
-The tool tests write access to your `OBSIDIAN_VAULT_PATH` early on. On macOS, ensure your Terminal app has "Full Disk Access" or access to your "Documents" folder.
+---
+
+## 🔒 Permissions & Privacy
+- **Local-First**: Your notes are stored locally on your machine.
+- **No Private Data Uploads**: Only video titles, descriptions, and transcripts are sent to the Gemini API for summarization; no personal account data is ever shared.
+- **Permissions**: Ensure your Terminal app has "Full Disk Access" or permission to access your "Documents" folder on macOS.
+
+---
+
+## 📜 License
+Distributed under the MIT License. See `LICENSE` for more information.
