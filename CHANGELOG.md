@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Added GitHub Dependabot configuration (`.github/dependabot.yml`) for automated dependency updates.
 - Created `retag_notes.py` script to apply taxonomy-consistent tagging to any Obsidian folder (e.g., Apple Notes).
 - Added multi-threading support to both `sync.py` and `retag_notes.py` using `ThreadPoolExecutor`.
 - Added configurable `THREAD_POOL_SIZE` for parallel processing.
@@ -23,5 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Improved keyword sanitizer to correctly handle word boundaries and CamelCase conversion (e.g., "neural network" -> "NeuralNetwork").
 
 ### Changed
+- Refactored absolute file paths to use dynamic relative paths (`os.path.expanduser('~')`) for improved portability across different environments.
+- Scrubbed hardcoded system username occurrences from repository files and history.
 - Updated `run.sh` to remove hardcoded API keys in favor of `.env` files.
 - Optimized tag generation prompts to focus on broad-to-specific hierarchical classification.
