@@ -90,6 +90,31 @@ python3 retag_notes.py --folder "~/Documents/Obsidian Vault/Apple Notes" --dry-r
 python3 retag_notes.py --folder "~/Documents/Obsidian Vault/Apple Notes"
 ```
 
+## 🤖 MCP Server Integration (For AI Agents)
+
+This toolkit includes a native **Model Context Protocol (MCP)** server, allowing AI assistants (like Claude Desktop, Cursor, or other MCP-compatible clients) to autonomously trigger syncs or retag your vault.
+
+### Exposed Tools
+- `sync_youtube_history(mode)`: Triggers the main sync engine (supports `incremental`, `init`, `retag`, or `test` modes).
+- `retag_obsidian_notes(folder, dry_run)`: Triggers the retag engine against any local folder.
+
+### Setup for Claude Desktop
+Add the following to your `claude_desktop_config.json`:
+
+```json
+{
+  "mcpServers": {
+    "YouTubeSyncTool": {
+      "command": "/absolute/path/to/YouTubeSyncTool/venv/bin/python3",
+      "args": [
+        "/absolute/path/to/YouTubeSyncTool/mcp_server.py"
+      ]
+    }
+  }
+}
+```
+*Note: Ensure you replace `/absolute/path/to/` with the actual path to the repository on your machine.*
+
 ---
 
 ## 🏗️ Why this works for Obsidian

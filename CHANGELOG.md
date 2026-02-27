@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Created `mcp_server.py` implementing a native Model Context Protocol (MCP) server via `FastMCP` to allow agentic systems to autonomously run the sync and retagging tools.
+- Added `mcp` SDK to dependencies.
 - Added `CONTRIBUTING.md` with setup instructions, contribution guidelines, and PR etiquette.
 - Added `.github/ISSUE_TEMPLATE/bug_report.md` structured bug report template.
 - Added `.github/ISSUE_TEMPLATE/feature_request.md` structured feature request template.

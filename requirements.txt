@@ -5,3 +5,4 @@ yt-dlp>=2025.2.19
 python-dotenv>=1.0.0
 tenacity>=8.2.0
 requests>=2.31.0
+mcp>=1.2.0
