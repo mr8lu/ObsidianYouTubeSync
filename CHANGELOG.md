@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-02-27
 ### Added
 - Added GitHub Dependabot configuration (`.github/dependabot.yml`) for automated dependency updates.
 - Created `retag_notes.py` script to apply taxonomy-consistent tagging to any Obsidian folder (e.g., Apple Notes).
