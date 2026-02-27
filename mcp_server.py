@@ -3,7 +3,7 @@ import subprocess
 import os
 
 # Initialize FastMCP server
-mcp = FastMCP("YouTubeSyncTool")
+mcp = FastMCP("ObsidianYouTubeSync")
 
 @mcp.tool()
 def sync_youtube_history(mode: str) -> str:
