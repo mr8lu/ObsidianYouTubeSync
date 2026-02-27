@@ -1,0 +1,24 @@
+# Environment variables
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+ENV/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Project specific
+.write_test
+
+# Ignore all markdown files by default (to skip Obsidian notes)
+*.md
+
+# But allow these project files
+!README.md
+!CHANGELOG.md
+proxies.txt

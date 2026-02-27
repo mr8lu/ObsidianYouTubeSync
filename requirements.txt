@@ -1,0 +1,4 @@
+pydantic>=2.0.0
+youtube-transcript-api>=0.6.2
+google-genai>=0.3.0
+yt-dlp>=2025.2.19
