@@ -65,7 +65,7 @@ python3 retag_notes.py --dry-run
 python3 retag_notes.py
 
 # Process specific folder
-python3 retag_notes.py --folder "/Users/[user name]/Documents/Obsidian Vault/Books"
+python3 retag_notes.py --folder "~/Documents/Obsidian Vault/Books"
 ```
 
 ## Features

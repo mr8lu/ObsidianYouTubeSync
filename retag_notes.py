@@ -19,7 +19,7 @@ Usage:
 
 Examples:
     python3 retag_notes.py
-    python3 retag_notes.py --folder "/Users/[user name]/Documents/Obsidian Vault/Books"
+    python3 retag_notes.py --folder "~/Documents/Obsidian Vault/Books"
     python3 retag_notes.py --dry-run
     python3 retag_notes.py --workers 10
 """
@@ -44,7 +44,7 @@ from taxonomy import normalize_tags, TAXONOMY_HINT, DYNAMIC_PREFIXES
 # ---------------------------------------------------------------------------
 # Configuration
 # ---------------------------------------------------------------------------
-OBSIDIAN_VAULT_PATH = "/Users/[user name]/Documents/Obsidian Vault"
+OBSIDIAN_VAULT_PATH = os.path.expanduser("~/Documents/Obsidian Vault")
 DEFAULT_TARGET_FOLDER = os.path.join(OBSIDIAN_VAULT_PATH, "Apple Notes")
 
 GEMINI_API_DELAY_SECONDS = 0.12   # Stay under Gemini RPM limit

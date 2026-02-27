@@ -24,7 +24,7 @@ from tenacity import retry, wait_random, wait_random_exponential, stop_after_att
 from taxonomy import normalize_tags, TAXONOMY_HINT
 
 # Configuration
-OBSIDIAN_VAULT_PATH = "/Users/[user name]/Documents/Obsidian Vault"
+OBSIDIAN_VAULT_PATH = os.path.expanduser("~/Documents/Obsidian Vault")
 YOUTUBE_FOLDER = os.path.join(OBSIDIAN_VAULT_PATH, "YouTube")
 BROWSER_FOR_COOKIES = "chrome"  # Change to 'safari', 'firefox', etc. if needed
 MAX_VIDEOS_TO_FETCH = 100  # Number of recent videos to check in history
