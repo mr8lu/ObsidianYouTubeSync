@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Added `CONTRIBUTING.md` with setup instructions, contribution guidelines, and PR etiquette.
+- Added `.github/ISSUE_TEMPLATE/bug_report.md` structured bug report template.
+- Added `.github/ISSUE_TEMPLATE/feature_request.md` structured feature request template.
+- Added **Sample Output Note** section to `README.md` showing a real example of a generated Obsidian note.
+- Added **Roadmap** table to `README.md` listing completed and upcoming features.
+- Added **Compatibility** table to `README.md` covering macOS, Linux, Python, and browser support.
+- Added `python-dotenv`, `tenacity`, and `requests` to `requirements.txt` (were used in code but missing from the manifest).
+
+### Changed
+- Revamped `README.md` with improved SEO-focused title, badges, and structured sections targeting the Obsidian/PKM community.
+- Updated `.gitignore` to explicitly allow `.github/ISSUE_TEMPLATE/` and `CONTRIBUTING.md` while keeping `PROMOTION.md` local-only.
+
 ## [1.0.0] - 2026-02-27
 ### Added
 - Added GitHub Dependabot configuration (`.github/dependabot.yml`) for automated dependency updates.
