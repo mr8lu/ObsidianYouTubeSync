@@ -159,37 +159,37 @@ python3 retag_notes.py --folder "~/Documents/Obsidian Vault/Books" --workers 10
 
 ---
 
-## 🤖 MCP Server — AI Agent Integration
+## 🤖 AI Agent Integrations (OpenClaw & MCP)
 
-This toolkit ships with a native **[Model Context Protocol (MCP)](https://modelcontextprotocol.io)** server. Wire it directly into Claude Desktop, Cursor, or any MCP-compatible agent to let AI autonomously manage your knowledge base.
+This toolkit is designed to be fully manageable by local-first AI agents. There are two primary integration paths:
 
-### Exposed Agent Tools
+### 1. OpenClaw Skill (Recommended)
+You can teach the [OpenClaw](https://openclaw.ai) Mac AI agent how to autonomously run your syncs and retag folders using a native `SKILL.md` file.
 
-```
-sync_youtube_history(mode: str)
-  → Triggers the YouTube sync pipeline.
-  → mode: "incremental" | "init" | "retag" | "test"
+**Installation:**
+Create a folder at `~/.openclaw/skills/obsidian-youtube-sync/` and drop in a `SKILL.md` file that explains how to execute `./run.sh` and `retag_notes.py`. (A working template is provided upon request).
+Once installed, you can simply ask OpenClaw: *"Sync my YouTube watch history and let me know what themes I learned about today."*
 
-retag_obsidian_notes(folder: str = None, dry_run: bool = False)
-  → Runs the AI retagging engine on any local folder.
-```
+### 2. Model Context Protocol (MCP) Server
+Alternatively, you can expose the toolkit as an **MCP server** to Claude Desktop, Cursor, or other MCP clients.
+> *Note: The `mcp_server.py` file is currently parked on the `dev/v1.0.1` branch.*
 
-### Claude Desktop Setup
-
-Add to your `claude_desktop_config.json`:
+**Setup for Claude Desktop (when using `dev/v1.0.1`):**
+Add the following to your `claude_desktop_config.json`:
 
 ```json
 {
   "mcpServers": {
     "ObsidianYouTubeSync": {
       "command": "/absolute/path/to/ObsidianYouTubeSync/venv/bin/python3",
-      "args": ["/absolute/path/to/ObsidianYouTubeSync/mcp_server.py"]
+      "args": [
+        "/absolute/path/to/ObsidianYouTubeSync/mcp_server.py"
+      ]
     }
   }
 }
 ```
-
-Once configured, you can prompt Claude: *"Sync my YouTube history and categorize anything I've watched about LLMs this week."*
+*Note: Ensure you replace `/absolute/path/to/` with the actual path to the repository on your machine.*
 
 ---
 
