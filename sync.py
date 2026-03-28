@@ -341,6 +341,59 @@ def add_to_failed_cache(video_id: str):
     with open(FAILED_CACHE_FILE, "a", encoding="utf-8") as f:
         f.write(f"{video_id}\n")
 
+def check_cookie_status():
+    """Diagnose yt-dlp cookie extraction issues."""
+    print(f"\nTesting cookie extraction from '{BROWSER_FOR_COOKIES}'...")
+    print("Running diagnostic command: yt-dlp --cookies-from-browser ...\n")
+    
+    cmd = [
+        "yt-dlp",
+        "--cookies-from-browser", BROWSER_FOR_COOKIES,
+        "--dump-json",
+        "https://www.youtube.com/feed/history",
+        "--playlist-end", "1"
+    ]
+    
+    try:
+        result = subprocess.run(cmd, capture_output=True, text=True)
+        
+        # Check stderr for warnings
+        if "WARNING" in result.stderr or "Could not extract" in result.stderr or result.returncode != 0:
+            print("❌ COOKIE EXTRACTION FAILED\n")
+            print("yt-dlp encountered the following error:")
+            print(f"{result.stderr.strip()}\n")
+            
+            print("--- COMMON MACOS FIXES ---")
+            print("1. Full Disk Access (Most Common):")
+            print("   Go to System Settings > Privacy & Security > Full Disk Access.")
+            print("   Ensure your Terminal (or VS Code, Cursor, iTerm) is toggled ON.")
+            print(f"\n2. {BROWSER_FOR_COOKIES.capitalize()} is Running:")
+            print(f"   Browsers lock their cookie database while open. Try completely quitting")
+            print(f"   {BROWSER_FOR_COOKIES.capitalize()} (Cmd+Q) and running this command again.")
+            print("\n3. Wrong Profile:")
+            print(f"   If your YouTube account is not on the default profile, edit sync.py:")
+            print(f"   BROWSER_FOR_COOKIES = \"{BROWSER_FOR_COOKIES}:Profile 2\"")
+            return
+            
+        # Check stdout for valid JSON response (indicating success)
+        if result.stdout.strip():
+            print("✅ COOKIES EXTRACTED SUCCESSFULLY\n")
+            print("Authentication with YouTube worked perfectly. We found recent history.")
+            return
+            
+        # If no warnings and no output, likely history is just empty
+        print("⚠️ COOKIES EXTRACTED, BUT HISTORY IS EMPTY\n")
+        print(f"yt-dlp successfully accessed {BROWSER_FOR_COOKIES}, but the YouTube history feed")
+        print("returned an empty playlist. Please check:")
+        print(" - Is your YouTube watch history paused in your Google Account settings?")
+        print(f" - Are you logged into the correct Google account on {BROWSER_FOR_COOKIES}?")
+        
+    except FileNotFoundError:
+        print("❌ ERROR: 'yt-dlp' is not installed or not found in your PATH.")
+        print("Are you running this inside the virtual environment? (e.g. ./run.sh)")
+    except Exception as e:
+        print(f"❌ UNEXPECTED ERROR: {e}")
+
 def retag_existing_notes(client: genai.Client):
     """
     --retag mode: Re-examine all existing Obsidian YouTube notes, re-run Gemini tagging
@@ -449,8 +502,13 @@ def main():
     group.add_argument("--sync", action="store_true", help="Sync full YouTube watch history (skips already existing files). Throttling is always enabled.")
     group.add_argument("--test", action="store_true", help="Test the script by fetching exactly 1 recent video.")
     group.add_argument("--retag", action="store_true", help="Re-examine and overwrite tags in all existing Obsidian notes using the current taxonomy. No YouTube data is re-fetched.")
+    group.add_argument("--check-cookies", action="store_true", help="Diagnose browser cookie extraction and YouTube authentication")
     parser.add_argument("--no-transcript", action="store_true", help="Skip transcript retrieval step.")
     args = parser.parse_args()
+
+    if args.check_cookies:
+        check_cookie_status()
+        return
     
     # --sync mode pulls all history (None). Test pulls 1.
     if args.test:
