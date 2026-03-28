@@ -6,5 +6,5 @@
 # Activate virtual environment
 source "$(dirname "$0")/venv/bin/activate"
 
-# Run the sync script with any provided arguments (e.g., --init or --incremental)
+# Run the sync script with any provided arguments (e.g., --sync or --test)
 python3 "$(dirname "$0")/sync.py" "$@"
