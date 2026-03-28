@@ -29,4 +29,7 @@ proxies.txt
 .bmad-core
 .bmad-core/
 .gemini
+GEMINI.md
 PROMOTION.md
+
+.venv/
