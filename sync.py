@@ -494,7 +494,6 @@ def main():
             continue
 
         if is_youtube_short(video.video_id):
-            print(f"  [skip] {video.title} ({video.video_id}) is a YouTube Short. Skipping.")
             shorts_skipped += 1
             continue
 
@@ -503,18 +502,11 @@ def main():
     # Load failed cache and filter videos to process
     failed_cache = load_failed_cache()
     if failed_cache:
-        original_count = len(videos_to_process)
         videos_to_process = [v for v in videos_to_process if v.video_id not in failed_cache]
-        skipped_failed = original_count - len(videos_to_process)
-        if skipped_failed > 0:
-            print(f"Skipped {skipped_failed} previously failed video(s) found in cache.")
-
-    if shorts_skipped:
-        print(f"Skipped {shorts_skipped} YouTube Short(s).")
 
     # Process from oldest to latest
     videos_to_process.reverse()
-    print(f"Queueing {len(videos_to_process)} new videos to process (oldest to newest)...")
+    print(f"Syncing {len(videos_to_process)} new video(s)...")
     
     processed_count = 0
     processed_lock = threading.Lock()
