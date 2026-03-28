@@ -26,8 +26,8 @@ from taxonomy import normalize_tags, TAXONOMY_HINT
 # Configuration
 OBSIDIAN_VAULT_PATH = os.path.expanduser("~/Documents/Obsidian Vault")
 YOUTUBE_FOLDER = os.path.join(OBSIDIAN_VAULT_PATH, "YouTube")
+FAILED_CACHE_FILE = os.path.join(YOUTUBE_FOLDER, ".failed_videos.txt")
 BROWSER_FOR_COOKIES = "chrome"  # Change to 'safari', 'firefox', etc. if needed
-MAX_VIDEOS_TO_FETCH = 100  # Number of recent videos to check in history
 
 # Proxy Config
 WEBSHARE_PROXY_USER = os.environ.get("WEBSHARE_PROXY_USER")
@@ -35,9 +35,9 @@ WEBSHARE_PROXY_PASS = os.environ.get("WEBSHARE_PROXY_PASS")
 YTDLP_PROXY_URL = f"http://{WEBSHARE_PROXY_USER}:{WEBSHARE_PROXY_PASS}@p.webshare.io:80/"
 
 # Rate Limit Configs
-YOUTUBE_FETCH_DELAY_SECONDS = 0    # Pause between history fetches (set >0 to avoid IP blocks)
+YOUTUBE_FETCH_DELAY_SECONDS = 0.22    # Pause between history fetches (set >0 to avoid IP blocks)
 GEMINI_API_DELAY_SECONDS = 0.12    # Stay safely under RPM limit for Gemini Flash
-THREAD_POOL_SIZE = 25               # Parallel workers for video processing and re-tagging
+THREAD_POOL_SIZE = 2               # Parallel workers for video processing and re-tagging
 
 def is_youtube_short(video_id: str) -> bool:
     """
@@ -91,12 +91,16 @@ def get_recent_history(max_fetch: Optional[int]) -> List[VideoMeta]:
         
     cmd = [
         "yt-dlp",
-        "--proxy", YTDLP_PROXY_URL,
         f"--cookies-from-browser", BROWSER_FOR_COOKIES,
         "--flat-playlist",
         "--print", "%(id)s|%(title)s|%(uploader)s",
         "https://www.youtube.com/feed/history"
     ]
+    
+    if WEBSHARE_PROXY_USER and WEBSHARE_PROXY_PASS:
+        # Insert proxy config after yt-dlp
+        cmd.insert(1, "--proxy")
+        cmd.insert(2, YTDLP_PROXY_URL)
     
     if max_fetch and max_fetch > 0:
         cmd.extend(["--playlist-end", str(max_fetch)])
@@ -123,7 +127,6 @@ def get_video_details(video_id: str) -> Dict[str, str]:
     """Fetch video description and channel name using yt-dlp."""
     cmd = [
         "yt-dlp",
-        "--proxy", YTDLP_PROXY_URL,
         f"--cookies-from-browser", BROWSER_FOR_COOKIES,
         "--dump-json",
         "--no-download",
@@ -131,6 +134,9 @@ def get_video_details(video_id: str) -> Dict[str, str]:
         "--ignore-no-formats-error",
         f"https://www.youtube.com/watch?v={video_id}"
     ]
+    if WEBSHARE_PROXY_USER and WEBSHARE_PROXY_PASS:
+        cmd.insert(1, "--proxy")
+        cmd.insert(2, YTDLP_PROXY_URL)
     try:
         result = subprocess.run(cmd, capture_output=True, text=True, check=True)
         data = json.loads(result.stdout)
@@ -323,6 +329,18 @@ def check_write_permissions(path: str):
         print(f"Details: {e}")
         sys.exit(1)
 
+def load_failed_cache() -> set:
+    """Load the set of continually failing video IDs from cache."""
+    if not os.path.exists(FAILED_CACHE_FILE):
+        return set()
+    with open(FAILED_CACHE_FILE, "r", encoding="utf-8") as f:
+        return set(line.strip() for line in f if line.strip())
+
+def add_to_failed_cache(video_id: str):
+    """Append a video ID to the failure cache."""
+    with open(FAILED_CACHE_FILE, "a", encoding="utf-8") as f:
+        f.write(f"{video_id}\n")
+
 def retag_existing_notes(client: genai.Client):
     """
     --retag mode: Re-examine all existing Obsidian YouTube notes, re-run Gemini tagging
@@ -428,22 +446,21 @@ def retag_existing_notes(client: genai.Client):
 def main():
     parser = argparse.ArgumentParser(description="Sync YouTube watch history to Obsidian Vault.")
     group = parser.add_mutually_exclusive_group(required=True)
-    group.add_argument("--init", action="store_true", help="Slowly add historical videos (downloads up to 500 items).")
-    group.add_argument("--incremental", action="store_true", help="Check history for new videos and stop pulling when it hits an already synced video.")
+    group.add_argument("--sync", action="store_true", help="Sync full YouTube watch history (skips already existing files). Throttling is always enabled.")
     group.add_argument("--test", action="store_true", help="Test the script by fetching exactly 1 recent video.")
     group.add_argument("--retag", action="store_true", help="Re-examine and overwrite tags in all existing Obsidian notes using the current taxonomy. No YouTube data is re-fetched.")
     parser.add_argument("--no-transcript", action="store_true", help="Skip transcript retrieval step.")
     args = parser.parse_args()
     
-    # Init mode pulls all history (None). Incremental pulls MAX_VIDEOS_TO_FETCH. Test pulls 1.
+    # --sync mode pulls all history (None). Test pulls 1.
     if args.test:
         fetch_limit = 1
-    elif args.init:
+    elif args.sync:
         fetch_limit = None
     elif args.retag:
         fetch_limit = 0  # No YouTube fetch needed
     else:
-        fetch_limit = MAX_VIDEOS_TO_FETCH
+        fetch_limit = None
 
     api_key = os.environ.get("GEMINI_API_KEY")
     if not api_key:
@@ -471,12 +488,10 @@ def main():
         filename = f"{sanitize_filename(video.title)}.md"
         filepath = os.path.join(YOUTUBE_FOLDER, filename)
         
+        # NOTE: Incremental mode behaves like init mode in that it uses continue
+        # but the actual fetch limit restricts how far down the history it looks.
         if os.path.exists(filepath):
-            if args.incremental:
-                print(f"Encountered existing video ({filename}). Stopping incremental search.")
-                break
-            else:
-                continue
+            continue
 
         if is_youtube_short(video.video_id):
             print(f"  [skip] {video.title} ({video.video_id}) is a YouTube Short. Skipping.")
@@ -484,6 +499,15 @@ def main():
             continue
 
         videos_to_process.append(video)
+
+    # Load failed cache and filter videos to process
+    failed_cache = load_failed_cache()
+    if failed_cache:
+        original_count = len(videos_to_process)
+        videos_to_process = [v for v in videos_to_process if v.video_id not in failed_cache]
+        skipped_failed = original_count - len(videos_to_process)
+        if skipped_failed > 0:
+            print(f"Skipped {skipped_failed} previously failed video(s) found in cache.")
 
     if shorts_skipped:
         print(f"Skipped {shorts_skipped} YouTube Short(s).")
@@ -498,6 +522,10 @@ def main():
     delayed_lock = threading.Lock()
 
     def process_video(video, try_number=1, is_delayed=False):
+        # Throttle processing to prevent IP blocking across threads
+        if not is_delayed:
+            time.sleep(YOUTUBE_FETCH_DELAY_SECONDS)
+        
         nonlocal processed_count
         start_time = time.time()
 
@@ -512,8 +540,6 @@ def main():
             filepath = os.path.join(YOUTUBE_FOLDER, filename)
 
             if os.path.exists(filepath):
-                if args.incremental and not is_delayed:
-                    return "STOP_INCREMENTAL"
                 return "SKIPPED"
 
             print(f"  [{video.video_id}] Fetching details...")
@@ -560,12 +586,7 @@ def main():
         try:
             for future in as_completed(futures):
                 status = future.result()
-                if status == "STOP_INCREMENTAL":
-                    print("Encountered existing video. Stopping incremental search.")
-                    stop_event.set()
-                    executor.shutdown(wait=False, cancel_futures=True)
-                    break
-                elif status == "DELAY":
+                if status == "DELAY":
                     video = futures[future]
                     with delayed_lock:
                         delayed_queue.append(video)
@@ -583,7 +604,8 @@ def main():
                 time.sleep(YOUTUBE_FETCH_DELAY_SECONDS)
             status = process_video(video, try_number=2, is_delayed=True)
             if status == "DELAY":
-                print(f"  -> Video continuously failing. Skipping entirely.")
+                print(f"  -> Video continuously failing. Adding to failure cache.")
+                add_to_failed_cache(video.video_id)
 
     print("\nSync complete!")
 
