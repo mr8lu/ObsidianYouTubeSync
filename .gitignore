@@ -19,6 +19,7 @@ Thumbs.db
 *.md
 
 # But allow these project files
+!docs/**.md
 !README.md
 !CHANGELOG.md
 !CONTRIBUTING.md

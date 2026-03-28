@@ -159,6 +159,33 @@ def test_main_cli_sync(mock_env_get, mock_check_perms, mock_client, mock_get_his
     # because --sync parses the full history list
     mock_get_history.assert_called_once_with(None)
 
+@patch('sync.YouTubeTranscriptApi')
+@patch('sync.WebshareProxyConfig')
+def test_get_transcript_nonetype_error(mock_proxy, mock_api_class):
+    mock_api = mock_api_class.return_value
+    # Simulate api.list returning None, which would normally cause AttributeError
+    mock_api.list.return_value = None
+    
+    from sync import get_transcript
+    # This should return None and NOT raise an exception (thus no retries)
+    result = get_transcript("vid123")
+    
+    assert result is None
+    assert mock_api.list.call_count == 1
+
+@patch('sync.YouTubeTranscriptApi')
+@patch('sync.WebshareProxyConfig')
+def test_get_transcript_attribute_error_nonetype(mock_proxy, mock_api_class):
+    mock_api = mock_api_class.return_value
+    # Simulate an AttributeError with "NoneType" in the message
+    mock_api.list.side_effect = AttributeError("'NoneType' object has no attribute 'list'")
+    
+    from sync import get_transcript
+    result = get_transcript("vid456")
+    
+    assert result is None
+    assert mock_api.list.call_count == 1
+
 @patch('sys.argv', ['sync.py', '--init'])
 def test_main_cli_init_fails():
     with pytest.raises(SystemExit):

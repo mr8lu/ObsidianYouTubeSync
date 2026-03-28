@@ -167,13 +167,22 @@ def get_transcript(video_id: str) -> Optional[str]:
         api = YouTubeTranscriptApi(proxy_config=proxy_config)
         transcript_list = api.list(video_id)
         
+        # Check for NoneType returned by api.list()
+        if transcript_list is None:
+            print(f"  [{video_id}] Transcript list is None. Bypassing.")
+            return None
+
         # Try to find english, traditional chinese, or simplified chinese transcripts,
         # or just fallback to whatever might be available.
         try:
             transcript = transcript_list.find_transcript(['en', 'zh-TW', 'zh-Hant', 'zh-CN', 'zh-Hans', 'zh'])
         except Exception:
             # Fallback to the first available transcript if native preferred languages aren't found
-            transcript = next(iter(transcript_list))
+            try:
+                transcript = next(iter(transcript_list))
+            except StopIteration:
+                print(f"  [{video_id}] No transcripts found (empty list). Bypassing.")
+                return None
             
             # If it's translatable, translate it to English or Chinese
             if hasattr(transcript, 'translation_languages'):
@@ -182,6 +191,10 @@ def get_transcript(video_id: str) -> Optional[str]:
                         transcript = transcript.translate(lang)
                         break
             
+        if transcript is None:
+            print(f"  [{video_id}] Transcript object is None. Bypassing.")
+            return None
+
         fetched = transcript.fetch()
         
         # Combine text
@@ -189,6 +202,12 @@ def get_transcript(video_id: str) -> Optional[str]:
         
         # Clean up HTML entities
         return html.unescape(full_text)
+    except (AttributeError, TypeError) as e:
+        if "'NoneType' object" in str(e):
+            print(f"  [{video_id}] Transcript bypass due to NoneType error: {e}")
+            return None
+        print(f"    (Retrying get_transcript... Error: {e})")
+        raise e
     except Exception as e:
         print(f"    (Retrying get_transcript... Error: {e})")
         raise e
