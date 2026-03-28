@@ -21,8 +21,12 @@ Thumbs.db
 # But allow these project files
 !README.md
 !CHANGELOG.md
+!CONTRIBUTING.md
+!.github/ISSUE_TEMPLATE/bug_report.md
+!.github/ISSUE_TEMPLATE/feature_request.md
 proxies.txt
 
 .bmad-core
 .bmad-core/
 .gemini
+PROMOTION.md
