@@ -132,11 +132,8 @@ WEBSHARE_PROXY_PASS=your_proxy_password
 ### Sync Your YouTube Watch History
 
 ```bash
-# First-time full sync (downloads your complete watch history)
-./run.sh --init
-
-# Incremental daily sync (only processes new videos)
-./run.sh --incremental
+# Full sync (downloads and updates your watch history, skipping existing videos)
+./run.sh --sync
 
 # Re-tag and re-categorize all existing notes with the latest taxonomy
 ./run.sh --retag
@@ -198,7 +195,7 @@ Add the following to your `claude_desktop_config.json`:
 This tool is purpose-built as a **data pipeline** for knowledge graph construction. Here's how to plug it into downstream systems:
 
 ### For GraphRAG (Microsoft GraphRAG / LlamaIndex)
-1. Run `./run.sh --init` to sync your complete YouTube history
+1. Run `./run.sh --sync` to sync your complete YouTube history
 2. Point your GraphRAG pipeline at the `~/Documents/Obsidian Vault/YouTube/` folder
 3. The YAML frontmatter is parsed as node metadata; transcripts are chunked for retrieval; tags form the typed edge schema
 
