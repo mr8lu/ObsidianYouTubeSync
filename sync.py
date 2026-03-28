@@ -28,7 +28,6 @@ OBSIDIAN_VAULT_PATH = os.path.expanduser("~/Documents/Obsidian Vault")
 YOUTUBE_FOLDER = os.path.join(OBSIDIAN_VAULT_PATH, "YouTube")
 FAILED_CACHE_FILE = os.path.join(YOUTUBE_FOLDER, ".failed_videos.txt")
 BROWSER_FOR_COOKIES = "chrome"  # Change to 'safari', 'firefox', etc. if needed
-MAX_VIDEOS_TO_FETCH = 100  # Number of recent videos to check in history
 
 # Proxy Config
 WEBSHARE_PROXY_USER = os.environ.get("WEBSHARE_PROXY_USER")
