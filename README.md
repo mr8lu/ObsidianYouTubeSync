@@ -101,10 +101,8 @@ In this episode, Lex Fridman sits down with John Carmack to discuss...
 git clone https://github.com/mr8lu/ObsidianYouTubeSync.git
 cd ObsidianYouTubeSync
 
-# Set up Python environment
-python3 -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
+# Set up Python environment using uv (Fast Python Package Manager)
+uv sync
 ```
 
 ### Configuration
@@ -164,23 +162,25 @@ This toolkit is designed to be fully manageable by local-first AI agents. There 
 You can teach the [OpenClaw](https://openclaw.ai) Mac AI agent how to autonomously run your syncs and retag folders using a native `SKILL.md` file.
 
 **Installation:**
-Create a folder at `~/.openclaw/skills/obsidian-youtube-sync/` and drop in a `SKILL.md` file that explains how to execute `./run.sh` and `retag_notes.py`. (A working template is provided upon request).
+Create a folder at `~/.openclaw/skills/obsidian-youtube-sync/` and drop in a `SKILL.md` file that explain how to execute `./run.sh` and `uv run retag_notes.py`. (A working template is provided upon request).
 Once installed, you can simply ask OpenClaw: *"Sync my YouTube watch history and let me know what themes I learned about today."*
 
 ### 2. Model Context Protocol (MCP) Server
 Alternatively, you can expose the toolkit as an **MCP server** to Claude Desktop, Cursor, or other MCP clients.
-> *Note: The `mcp_server.py` file is currently parked on the `dev/v1.0.1` branch.*
 
-**Setup for Claude Desktop (when using `dev/v1.0.1`):**
+**Setup for Claude Desktop:**
 Add the following to your `claude_desktop_config.json`:
 
 ```json
 {
   "mcpServers": {
     "ObsidianYouTubeSync": {
-      "command": "/absolute/path/to/ObsidianYouTubeSync/venv/bin/python3",
+      "command": "uv",
       "args": [
-        "/absolute/path/to/ObsidianYouTubeSync/mcp_server.py"
+        "--directory",
+        "/absolute/path/to/ObsidianYouTubeSync",
+        "run",
+        "mcp_server.py"
       ]
     }
   }
