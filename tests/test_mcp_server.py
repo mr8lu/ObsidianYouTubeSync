@@ -17,7 +17,7 @@ with patch('mcp.server.fastmcp.FastMCP') as MockMCP:
 def test_sync_youtube_history_invalid_mode():
     result = sync_youtube_history("invalid")
     assert "Error: Invalid mode 'invalid'" in result
-    assert "Allowed modes are: incremental, init, retag, test" in result
+    assert "Allowed modes are: sync, retag, test, check-cookies" in result
 
 @patch('subprocess.run')
 def test_sync_youtube_history_success(mock_run):
@@ -58,8 +58,8 @@ def test_retag_obsidian_notes_defaults(mock_run):
     
     mock_run.assert_called_once()
     args, kwargs = mock_run.call_args
-    assert "retag_notes.py" in args[0][1]
-    assert len(args[0]) == 2 # Only python_exec and script_path
+    assert "retag_notes.py" in args[0][2]
+    assert len(args[0]) == 3 # uv, run, and script_path
     
     assert "Successfully ran retag notes" in result
 
