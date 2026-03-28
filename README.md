@@ -24,6 +24,24 @@ If you have hundreds or thousands of videos in your YouTube history, finding ins
 - **Organizing** notes into Obsidian with clean YAML frontmatter (tags, url, channel, date, summary) — queryable via Dataview
 - **Enabling** downstream pipelines: export structured notes as a knowledge graph dataset for **GraphRAG**, **OpenClaw**, vector databases, or LLM fine-tuning
 
+### 🗺️ Pipeline Architecture
+
+```mermaid
+graph TD
+    A[YouTube Watch History] -->|Browser Cookies & yt-dlp| B(Extract Metadata & Transcripts)
+    B --> C{Google Gemini GenAI}
+    C -->|Analyze text| D[Generate Concise Summary]
+    C -->|Classify concepts| E[Apply AI Taxonomy Tags]
+    D --> F[Construct Structured Markdown]
+    E --> F
+    F --> G[(Obsidian Vault / Knowledge Graph)]
+    G --> H[Ready for GraphRAG & Agents]
+    
+    classDef default fill:#f9f9f9,stroke:#5c3d9e,stroke-width:2px,color:#333;
+    classDef ai fill:#e6dfff,stroke:#8b6cef,stroke-width:2px,color:#333;
+    class C ai;
+```
+
 ---
 
 ## 🧠 Key Features
@@ -90,6 +108,7 @@ In this episode, Lex Fridman sits down with John Carmack to discuss...
 
 ### Prerequisites
 - **Python 3.10+**
+- **uv** — Fast Python Package Manager ([Installation Guide](https://docs.astral.sh/uv/getting-started/installation/))
 - **Google Gemini API Key** — free tier available at [Google AI Studio](https://aistudio.google.com/)
 - **Chrome, Safari, or Firefox** logged into YouTube (for `yt-dlp` history access)
 - **Obsidian** (optional but recommended for visualization and Dataview queries)
@@ -121,7 +140,7 @@ WEBSHARE_PROXY_USER=your_proxy_user
 WEBSHARE_PROXY_PASS=your_proxy_password
 ```
 
-> **Vault Path**: The default is `~/Documents/Obsidian Vault`. Update `OBSIDIAN_VAULT_PATH` in `sync.py` and `retag_notes.py` if your vault lives elsewhere.
+⚠️ **Important — Vault Path**: The default target directory is `~/Documents/Obsidian Vault`. **You must update `OBSIDIAN_VAULT_PATH` in `sync.py` and `retag_notes.py` if your vault lives elsewhere** before running any syncs.
 
 ---
 
