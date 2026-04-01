@@ -34,3 +34,5 @@ PROMOTION.md
 
 .venv/
 \n# MkDocs\nsite/\n
+!docs/**/*.md
+!docs/*.md
