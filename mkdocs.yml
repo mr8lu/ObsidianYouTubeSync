@@ -1,0 +1,50 @@
+site_name: ObsidianYouTubeSync
+site_description: YouTube History Downloader, Transcript Extractor & AI Knowledge Graph Builder
+site_url: https://mr8lu.github.io/ObsidianYouTubeSync/
+repo_url: https://github.com/mr8lu/ObsidianYouTubeSync
+repo_name: mr8lu/ObsidianYouTubeSync
+
+theme:
+  name: material
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.code.annotate
+  palette:
+    - scheme: default
+      primary: deep purple
+      accent: deep purple
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: deep purple
+      accent: deep purple
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - admonition
+  - pymdownx.details
+  - attr_list
+  - md_in_html
+
+nav:
+  - Home: index.md
+  - Setup Guide: setup.md
+  - Usage Guide: usage.md
+  - Integrations (AI & Agents): integrations.md
